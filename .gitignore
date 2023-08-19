@@ -1,0 +1,67 @@
+# Dependency directories
+node_modules/
+dist/
+tmp/
+build/
+
+# Compiled output
+*.log
+*.out
+*.pid
+*.swp
+*.swo
+*.tgz
+
+# Environment variables
+.env
+.env.*
+
+# IDE and editor files
+.idea/
+.vscode/
+*.sublime-*
+
+# Logs and generated files
+logs/
+*.log
+npm-debug.log*
+
+# Testing files
+coverage/
+
+# Package lock files
+package-lock.json
+yarn.lock
+
+# Environment-specific files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# macOS related files
+.DS_Store
+
+# Miscellaneous
+*.iml
+*.classpath
+*.project
+*.settings/
+*.tmproj
+.vscode/
+.history
+*.docset
+*.DS_Store
+*.TMP
+*._*
+*.spotlight-v100
+*.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Compiled TypeScript
+*.tsbuildinfo
+
+# NestJS generated files and folders
+dist/
+.nest/
