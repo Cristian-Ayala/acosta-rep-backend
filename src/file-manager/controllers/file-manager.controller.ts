@@ -7,6 +7,7 @@ import {
   UseInterceptors,
   Param,
   Res,
+  Body,
 } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
@@ -30,7 +31,7 @@ export class FileManagerController {
   @UseInterceptors(
     FilesInterceptor("file", 10, {
       storage: diskStorage({
-        destination: "./uploads",
+        destination: "src/KEEP_TRACK/uploads",
         filename: (req, file, cb) => {
           const [name, fileExtName] = replaceDotsWithUnderscores(
             file.originalname,
@@ -52,8 +53,11 @@ export class FileManagerController {
   )
   async uploadPhoto(
     @UploadedFiles() files: Express.Multer.File[],
+    @Body() body: any,
   ): Promise<ProcessedFilesResult> {
-    return this.fileManagerService.processUploadedFiles(files);
+    // Make sure the necessary properties are defined before accessing them
+    const userEmail = body.userEmail || null;
+    return this.fileManagerService.processUploadedFiles(files, userEmail);
   }
 
   @Get("photo/")

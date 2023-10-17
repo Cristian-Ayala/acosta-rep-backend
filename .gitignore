@@ -66,4 +66,4 @@ Thumbs.db
 dist/
 .nest/
 
-uploads/*
+*/KEEP_TRACK/uploads/

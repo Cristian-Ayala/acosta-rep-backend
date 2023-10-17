@@ -1,11 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { Response } from "express";
+import loggerService from "../../logger.service";
 
 @Injectable()
 export class FileManagerService {
   constructor() {}
 
-  processUploadedFiles(files: Express.Multer.File[]): ProcessedFilesResult {
+  processUploadedFiles(
+    files: Express.Multer.File[],
+    userEmail: string,
+  ): ProcessedFilesResult {
     if (!files)
       return {
         errors: ["No files found"],
@@ -13,7 +17,8 @@ export class FileManagerService {
         savedFilesOriginalNames: null,
       };
     files.forEach((file) => {
-      console.log("uploaded File: ", file);
+      const tmpFile = { ...file, userEmail };
+      loggerService.log(`uploaded File: ${JSON.stringify(tmpFile)}`);
     });
     return {
       errors: null,
@@ -23,11 +28,11 @@ export class FileManagerService {
   }
 
   serveDefaultPhoto(res: Response): void {
-    res.sendFile("default.jpg", { root: "./uploads" });
+    res.sendFile("default.jpg", { root: "src/KEEP_TRACK/uploads" });
   }
 
   servePhoto(filename: string, res: Response): void {
-    res.sendFile(filename, { root: "./uploads" });
+    res.sendFile(filename, { root: "src/KEEP_TRACK/uploads" });
   }
 }
 
