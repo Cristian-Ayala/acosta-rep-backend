@@ -9,6 +9,7 @@ import {
   Res,
   Body,
 } from "@nestjs/common";
+import loggerService from "../../logger.service";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { Response } from "express";
@@ -33,6 +34,9 @@ export class FileManagerController {
       storage: diskStorage({
         destination: "src/KEEP_TRACK/uploads",
         filename: (req, file, cb) => {
+          loggerService.log(`filename file ${JSON.stringify(file, null, 2)}`);
+          loggerService.log(`filename file type: ${typeof file}`);
+          loggerService.log(`filename file originalname: ${file.originalname}`);
           const [name, fileExtName] = replaceDotsWithUnderscores(
             file.originalname,
           );
@@ -41,6 +45,9 @@ export class FileManagerController {
         },
       }),
       fileFilter: (req, file, cb) => {
+        loggerService.log(`fileFilter file ${JSON.stringify(file, null, 2)}`);
+        loggerService.log(`fileFilter file type: ${typeof file}`);
+        loggerService.log(`fileFilter file originalname: ${file.originalname}`);
         if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
           return cb(
             new BadRequestException("Only image files are allowed!"),
@@ -57,6 +64,9 @@ export class FileManagerController {
   ): Promise<ProcessedFilesResult> {
     // Make sure the necessary properties are defined before accessing them
     const userEmail = body.userEmail || null;
+    loggerService.log(`userEmail ${userEmail}`);
+    loggerService.log(`files ${files}`);
+    loggerService.log(`files ${JSON.stringify(files, null, 2)}`);
     return this.fileManagerService.processUploadedFiles(files, userEmail);
   }
 

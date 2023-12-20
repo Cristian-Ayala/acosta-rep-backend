@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  postgres-db:
+    image: postgres:15.4-alpine3.17
+    restart: always
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../backup.sql:/docker-entrypoint-initdb.d/create_schema.sql
+      - postgres-data:/var/lib/postgresql/data/
+    networks:
+      - acosta-rep-network
+
+  nestjs-app:
+    image: acosta-rep-backend:latest
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../../BACK_UPS:/usr/app/src/KEEP_TRACK:rw
+    networks:
+      - acosta-rep-network
+    depends_on:
+      - postgres-db
+
+networks:
+  acosta-rep-network:
+
+volumes:
+  postgres-data:

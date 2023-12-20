@@ -1,0 +1,22 @@
+docker exec -t postgresql-postgres-db-1 pg_dump -U your-db-user -d postgres > backup.sql
+docker cp postgresql-postgres-db-1:/backup.sql ./backups/
+
+/*
+https://stackoverflow.com/questions/24718706/backup-restore-a-dockerized-postgresql-database
+docker exec -i set_up-postgres-db-1 psql -U your-db-user -d postgres
+every day has to change and move backup.sql to pathToNestJsProyect/KEEP_THIS/${day-hour}-backup.sql
+and new backup will now be "backup.sql"
+docker exec -t your-db-container pg_dumpall -c -U your-db-user > dump_$(date +%Y-%m-%d_%H_%M_%S).sql
+
+to reduce the size of the sql you can generate a compress:
+
+docker exec -t your-db-container pg_dumpall -c -U your-db-user | gzip > ./dump_$(date +"%Y-%m-%d_%H_%M_%S").gz
+
+to restore a compressed sql:
+
+gunzip < your_dump.sql.gz | docker exec -i your-db-container psql -U your-db-user -d your-db-name
+*/
+./backup.sql:./docker-entrypoint-initdb.d/create_tables.sql
+scp your-user@server-ip:/docker/postgresql/backup.sql /YOUR_PATH/SET_UP
+
+cat backup.sql | docker exec -i container-name psql -U your-db-user -d postgres

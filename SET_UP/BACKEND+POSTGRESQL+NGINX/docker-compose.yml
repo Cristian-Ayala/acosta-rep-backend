@@ -1,0 +1,102 @@
+version: "3"
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - certs:/etc/nginx/certs:ro
+      - vhostd:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+    networks:
+      acosta-rep-network:
+        aliases:
+          - nginxProxy
+
+  letsencrypt:
+    image: nginxproxy/acme-companion
+    restart: always
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - vhostd:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - acme:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      acosta-rep-network:
+        aliases:
+          - letsencrypt
+
+  nginxCouchdb:
+    image: nginx
+    restart: always
+    expose:
+      - "80"
+    volumes:
+      - /docker/nginx/conf/:/etc/nginx/conf.d/:rw
+    environment:
+      - VIRTUAL_HOST=${VIRTUAL_HOST_MAIN}
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST_MAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL_MAIN}
+    depends_on:
+      - nginx-proxy
+      - letsencrypt
+      - postgres-db
+    networks:
+      acosta-rep-network:
+        aliases:
+          - nginx
+
+  postgres-db:
+    image: postgres:15.4-alpine3.17
+    restart: always
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../backup.sql:/docker-entrypoint-initdb.d/create_schema.sql
+      - postgres-data:/var/lib/postgresql/data/
+    networks:
+      acosta-rep-network:
+        aliases:
+          - postgres-db
+
+  nestjs-app:
+    image: acosta-rep-backend:latest
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../../BACK_UPS:/usr/app/src/KEEP_TRACK:rw
+    networks:
+      acosta-rep-network:
+        aliases:
+          - nestjs-app
+    depends_on:
+      - postgres-db
+
+volumes:
+  certs:
+  html:
+  acme:
+  vhostd:
+  couchdbVol:
+  postgres-data:
+
+networks:
+  acosta-rep-network:
+    name: acosta_rep_net
+    driver: bridge
+    ipam:
+      driver: default

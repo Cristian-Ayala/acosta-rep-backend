@@ -2,37 +2,108 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# Description
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Nestjs project for repository [Acosta Repuestos Front-End](https://github.com/Cristian-Ayala/acosta-repuesto-vite). It is a project to save and serve images that are uploaded in frontend project.
 
-## Description
+# Installation
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## RUN BACKEND ALONE
 
-## Installation
+You must already have postgresql and if you want nginx, to expose your the endpoints. If everything is consumed local, then you dont need to expose them.
+
+Create and .env file and modify it with your own data.
 
 ```bash
-$ yarn install
+$ docker build -t acosta-rep-backend:1.0.0 -t acosta-rep-backend:latest .
+$ docker run -d -p 3000:3000 -v ./src/KEEP_TRACK:/usr/app/src/KEEP_TRACK/:rw acosta-rep-backend:1.0.0
 ```
 
-## Running the app
+## RUN BACKEND + POSTGRESQL
+
+Create an .env file and modify it with your own data.
+
+```bash
+$ docker build -t acosta-rep-backend:1.0.0 -t acosta-rep-backend:latest .
+```
+
+Create another .env file in SET_UP/BACKEND+POSTGRESQL
+
+```bash
+$ cd ./SET_UP/BACKEND+POSTGRESQL/
+$ nano .env
+```
+
+ADD variables needed (check env.properties file). It should match the values from main .env file.
+
+```bash
+$ docker compose up -d
+```
+
+If you want to reload the schema you got to delete the data volume.
+
+Warning from [postgresql docker image](https://hub.docker.com/_/postgres/): scripts in /docker-entrypoint-initdb.d are only run if you start the container with a data directory that is empty; any pre-existing database will be left untouched on container startup. One common problem is that if one of your /docker-entrypoint-initdb.d scripts fails (which will cause the entrypoint script to exit) and your orchestrator restarts the container with the already initialized data directory, it will not continue on with your scripts.
+
+```bash
+$ docker volume ls
+$ docker volume rm <volume_name>
+```
+
+## RUN BACKEND + POSTGRESQL + NGINX
+
+You must have a domain or subdomain pointing to your server, to expose your endpoint.
+SSL certification are created with certbot, a public IP address needs to be set in your server.
+
+Remember to open the port 80 and 443.
+
+Create an .env file and modify it with your own data.
+
+```bash
+$ docker build -t acosta-rep-backend:1.0.0 -t acosta-rep-backend:latest .
+```
+
+Create another .env file in SET_UP/BACKEND+POSTGRESQL+NGINX
+
+```bash
+$ cd ./SET_UP/BACKEND+POSTGRESQL+NGINX/
+$ nano .env
+```
+
+ADD variables needed (check env.properties file). It should match the values from main .env file.
+
+Modify file in ./conf/default.conf ---> server_name <YOUR_DOMAIN_OR_SUBDOMAIN>
+
+```bash
+$ docker compose up -d
+```
+
+If you want to reload the schema you got to delete the data volume.
+
+Warning from [postgresql docker image](https://hub.docker.com/_/postgres/): scripts in /docker-entrypoint-initdb.d are only run if you start the container with a data directory that is empty; any pre-existing database will be left untouched on container startup. One common problem is that if one of your /docker-entrypoint-initdb.d scripts fails (which will cause the entrypoint script to exit) and your orchestrator restarts the container with the already initialized data directory, it will not continue on with your scripts.
+
+```bash
+$ docker volume ls
+$ docker volume rm <volume_name>
+```
+
+# Useful commands
+
+```bash
+$ docker ps -a # list all the currently running containers
+$ docker exec -it <container_name> /bin/sh # run commands inside container
+$ scp -r <YOUR_PATH> <USER_IN_SERVER>@<PUBLIC_IP>:<SERVER_PATH> # copy files from --> to (local to server or viseverda changing the order)
+```
+
+# Create a postgresql backup if running on a docker container
+
+```bash
+$ docker exec -t <container_name> pg_dump -U <user_name> -d postgres > backup.sql
+$ docker cp <container_name>:/backup.sql ./YOUR_PATH/
+```
+
+# Running the app
+
+Remember to add an .env file and add all variables listed in env.properties
 
 ```bash
 # development
@@ -44,30 +115,3 @@ $ yarn run start:dev
 # production mode
 $ yarn run start:prod
 ```
-
-## Test
-
-```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
