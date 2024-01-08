@@ -32,6 +32,26 @@ services:
     env_file:
       - ../../.env
 
+  hasura:
+    image: hasura/graphql-engine:v2.36.1
+    restart: always
+    ports:
+      - "8080:8080" # Mapping Hasura GraphQL Engine port
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-db:5432/postgres
+      DB_URL_FROM_ENV: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-db:5432/postgres
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # Enabling Hasura Console (for development purposes)
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_ADMIN_SECRET_KEY}
+      HASURA_GRAPHQL_V1_BOOLEAN_NULL_COLLAPSE: true
+      HASURA_GRAPHQL_CORS_DOMAIN: ${HASURA_CORS_DOMAIN}
+      HASURA_GRAPHQL_JWT_SECRET: ${HASURA_JWT_SECRET}
+    volumes:
+      - ../hasura-metadata.json:/hasura_metadata.json
+    networks:
+      - acosta-rep-network
+    depends_on:
+      - postgres-db
+
 networks:
   acosta-rep-network:
 

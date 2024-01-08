@@ -1,0 +1,845 @@
+{
+  "resource_version": 110,
+  "metadata": {
+    "version": 3,
+    "sources": [
+      {
+        "name": "postgres",
+        "kind": "postgres",
+        "tables": [
+          {
+            "table": {
+              "name": "categorias",
+              "schema": "acostarep"
+            },
+            "insert_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "check": {},
+                  "columns": [
+                    "descripcion_categoria",
+                    "id",
+                    "nombre_categoria"
+                  ]
+                },
+                "comment": ""
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "columns": [
+                    "descripcion_categoria",
+                    "id",
+                    "is_active_categoria",
+                    "nombre_categoria"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              },
+              {
+                "role": "seller",
+                "permission": {
+                  "columns": [
+                    "descripcion_categoria",
+                    "id",
+                    "is_active_categoria",
+                    "nombre_categoria"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              }
+            ],
+            "update_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "columns": [
+                    "descripcion_categoria",
+                    "id",
+                    "is_active_categoria",
+                    "nombre_categoria"
+                  ],
+                  "filter": {},
+                  "check": null
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "cliente",
+              "schema": "acostarep"
+            },
+            "insert_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "check": {},
+                  "set": {
+                    "created_by": "x-hasura-user-email"
+                  },
+                  "columns": [
+                    "activo_cliente",
+                    "direccion",
+                    "dui",
+                    "email",
+                    "empresa",
+                    "id",
+                    "last_name",
+                    "name",
+                    "telefono"
+                  ]
+                },
+                "comment": ""
+              },
+              {
+                "role": "seller",
+                "permission": {
+                  "check": {},
+                  "set": {
+                    "created_by": "x-hasura-user-email"
+                  },
+                  "columns": [
+                    "activo_cliente",
+                    "direccion",
+                    "dui",
+                    "email",
+                    "empresa",
+                    "id",
+                    "last_name",
+                    "name",
+                    "telefono"
+                  ]
+                },
+                "comment": ""
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "columns": [
+                    "activo_cliente",
+                    "direccion",
+                    "dui",
+                    "email",
+                    "empresa",
+                    "last_name",
+                    "name",
+                    "telefono",
+                    "id",
+                    "created_by",
+                    "updated_by",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              },
+              {
+                "role": "seller",
+                "permission": {
+                  "columns": [
+                    "activo_cliente",
+                    "direccion",
+                    "dui",
+                    "email",
+                    "empresa",
+                    "last_name",
+                    "name",
+                    "telefono",
+                    "id",
+                    "created_by",
+                    "updated_by",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              }
+            ],
+            "update_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "columns": [
+                    "activo_cliente",
+                    "direccion",
+                    "dui",
+                    "email",
+                    "empresa",
+                    "id",
+                    "last_name",
+                    "name",
+                    "telefono"
+                  ],
+                  "filter": {},
+                  "check": {},
+                  "set": {
+                    "updated_by": "x-hasura-user-email"
+                  }
+                },
+                "comment": ""
+              },
+              {
+                "role": "seller",
+                "permission": {
+                  "columns": [
+                    "activo_cliente",
+                    "direccion",
+                    "dui",
+                    "email",
+                    "empresa",
+                    "id",
+                    "last_name",
+                    "name",
+                    "telefono"
+                  ],
+                  "filter": {},
+                  "check": {},
+                  "set": {
+                    "updated_by": "x-hasura-user-email"
+                  }
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "marcas",
+              "schema": "acostarep"
+            },
+            "insert_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "check": {},
+                  "columns": [
+                    "descripcion_marca",
+                    "id",
+                    "nombre_marca"
+                  ]
+                },
+                "comment": ""
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "columns": [
+                    "descripcion_marca",
+                    "id",
+                    "is_active_marca",
+                    "nombre_marca"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              },
+              {
+                "role": "seller",
+                "permission": {
+                  "columns": [
+                    "descripcion_marca",
+                    "id",
+                    "is_active_marca",
+                    "nombre_marca"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              }
+            ],
+            "update_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "columns": [
+                    "descripcion_marca",
+                    "id",
+                    "is_active_marca",
+                    "nombre_marca"
+                  ],
+                  "filter": {},
+                  "check": null
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "ordenes",
+              "schema": "acostarep"
+            },
+            "object_relationships": [
+              {
+                "name": "cliente",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "cliente_id": "id"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "cliente",
+                      "schema": "acostarep"
+                    }
+                  }
+                }
+              },
+              {
+                "name": "metodo_pago",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "metodo_pago_id": "id"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "types",
+                      "schema": "acostarep"
+                    }
+                  }
+                }
+              },
+              {
+                "name": "status",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "status_id": "id"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "types",
+                      "schema": "acostarep"
+                    }
+                  }
+                }
+              },
+              {
+                "name": "tipo_distribucion",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "tipo_distribucion_id": "id"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "types",
+                      "schema": "acostarep"
+                    }
+                  }
+                }
+              },
+              {
+                "name": "tipo_orden",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "tipo_orden_id": "id"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "types",
+                      "schema": "acostarep"
+                    }
+                  }
+                }
+              }
+            ],
+            "insert_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "check": {},
+                  "set": {
+                    "created_by": "x-hasura-user-email"
+                  },
+                  "columns": [
+                    "cede",
+                    "cliente_id",
+                    "id",
+                    "metodo_pago_id",
+                    "observaciones_orden",
+                    "status_id",
+                    "tipo_distribucion_id",
+                    "tipo_orden_id",
+                    "total_orden"
+                  ]
+                },
+                "comment": ""
+              },
+              {
+                "role": "seller",
+                "permission": {
+                  "check": {},
+                  "set": {
+                    "created_by": "x-hasura-user-email"
+                  },
+                  "columns": [
+                    "cede",
+                    "cliente_id",
+                    "id",
+                    "metodo_pago_id",
+                    "observaciones_orden",
+                    "status_id",
+                    "tipo_distribucion_id",
+                    "tipo_orden_id",
+                    "total_orden"
+                  ]
+                },
+                "comment": ""
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "columns": [
+                    "is_active_orden",
+                    "observaciones_orden",
+                    "total_orden",
+                    "cliente_id",
+                    "id",
+                    "metodo_pago_id",
+                    "status_id",
+                    "tipo_distribucion_id",
+                    "tipo_orden_id",
+                    "cede",
+                    "created_by",
+                    "updated_by",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              },
+              {
+                "role": "seller",
+                "permission": {
+                  "columns": [
+                    "is_active_orden",
+                    "observaciones_orden",
+                    "total_orden",
+                    "cliente_id",
+                    "id",
+                    "metodo_pago_id",
+                    "status_id",
+                    "tipo_distribucion_id",
+                    "tipo_orden_id",
+                    "cede",
+                    "created_by",
+                    "updated_by",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              }
+            ],
+            "update_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "columns": [
+                    "cede",
+                    "cliente_id",
+                    "id",
+                    "is_active_orden",
+                    "metodo_pago_id",
+                    "observaciones_orden",
+                    "status_id",
+                    "tipo_distribucion_id",
+                    "tipo_orden_id",
+                    "total_orden"
+                  ],
+                  "filter": {},
+                  "check": {},
+                  "set": {
+                    "updated_by": "x-hasura-user-email"
+                  }
+                },
+                "comment": ""
+              },
+              {
+                "role": "seller",
+                "permission": {
+                  "columns": [
+                    "cede",
+                    "cliente_id",
+                    "id",
+                    "is_active_orden",
+                    "metodo_pago_id",
+                    "observaciones_orden",
+                    "status_id",
+                    "tipo_distribucion_id",
+                    "tipo_orden_id",
+                    "total_orden"
+                  ],
+                  "filter": {},
+                  "check": {},
+                  "set": {
+                    "updated_by": "x-hasura-user-email"
+                  }
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "productos",
+              "schema": "acostarep"
+            },
+            "object_relationships": [
+              {
+                "name": "categoria",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "id_categoria": "id"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "categorias",
+                      "schema": "acostarep"
+                    }
+                  }
+                }
+              },
+              {
+                "name": "marca",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "id_marca": "id"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "marcas",
+                      "schema": "acostarep"
+                    }
+                  }
+                }
+              }
+            ],
+            "insert_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "check": {},
+                  "set": {
+                    "created_by": "x-hasura-user-email"
+                  },
+                  "columns": [
+                    "foto",
+                    "id",
+                    "id_categoria",
+                    "id_marca",
+                    "is_active_producto",
+                    "nombre_producto",
+                    "precio_mayoreo",
+                    "precio_publico",
+                    "precio_taller",
+                    "stock_prod_metapan",
+                    "stock_prod_sta_ana",
+                    "uom_id",
+                    "upc"
+                  ]
+                },
+                "comment": ""
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "columns": [
+                    "is_active_producto",
+                    "foto",
+                    "nombre_producto",
+                    "upc",
+                    "precio_mayoreo",
+                    "precio_publico",
+                    "precio_taller",
+                    "stock_prod_metapan",
+                    "stock_prod_sta_ana",
+                    "id",
+                    "id_categoria",
+                    "id_marca",
+                    "uom_id",
+                    "created_by",
+                    "updated_by",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              },
+              {
+                "role": "seller",
+                "permission": {
+                  "columns": [
+                    "is_active_producto",
+                    "foto",
+                    "nombre_producto",
+                    "upc",
+                    "precio_mayoreo",
+                    "precio_publico",
+                    "precio_taller",
+                    "stock_prod_metapan",
+                    "stock_prod_sta_ana",
+                    "id",
+                    "id_categoria",
+                    "id_marca",
+                    "uom_id",
+                    "created_by",
+                    "updated_by",
+                    "created_at",
+                    "updated_at"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              }
+            ],
+            "update_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "columns": [
+                    "foto",
+                    "id",
+                    "id_categoria",
+                    "id_marca",
+                    "is_active_producto",
+                    "nombre_producto",
+                    "precio_mayoreo",
+                    "precio_publico",
+                    "precio_taller",
+                    "stock_prod_metapan",
+                    "stock_prod_sta_ana",
+                    "uom_id",
+                    "upc"
+                  ],
+                  "filter": {},
+                  "check": null,
+                  "set": {
+                    "updated_by": "x-hasura-user-email"
+                  }
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "productos_orden",
+              "schema": "acostarep"
+            },
+            "object_relationships": [
+              {
+                "name": "orden",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "id_orden": "id"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "ordenes",
+                      "schema": "acostarep"
+                    }
+                  }
+                }
+              },
+              {
+                "name": "producto",
+                "using": {
+                  "manual_configuration": {
+                    "column_mapping": {
+                      "id_producto": "id"
+                    },
+                    "insertion_order": null,
+                    "remote_table": {
+                      "name": "productos",
+                      "schema": "acostarep"
+                    }
+                  }
+                }
+              }
+            ],
+            "insert_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "check": {},
+                  "columns": [
+                    "cantidad",
+                    "descuento",
+                    "id",
+                    "id_orden",
+                    "id_producto",
+                    "precio",
+                    "stock",
+                    "sub_total"
+                  ]
+                },
+                "comment": ""
+              },
+              {
+                "role": "seller",
+                "permission": {
+                  "check": {},
+                  "columns": [
+                    "cantidad",
+                    "descuento",
+                    "id",
+                    "id_orden",
+                    "id_producto",
+                    "precio",
+                    "stock",
+                    "sub_total"
+                  ]
+                },
+                "comment": ""
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "columns": [
+                    "cantidad",
+                    "descuento",
+                    "precio",
+                    "sub_total",
+                    "id",
+                    "id_orden",
+                    "id_producto",
+                    "stock",
+                    "created_at"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              },
+              {
+                "role": "seller",
+                "permission": {
+                  "columns": [
+                    "cantidad",
+                    "descuento",
+                    "precio",
+                    "sub_total",
+                    "id",
+                    "id_orden",
+                    "id_producto",
+                    "stock",
+                    "created_at"
+                  ],
+                  "filter": {},
+                  "allow_aggregations": true
+                },
+                "comment": ""
+              }
+            ]
+          },
+          {
+            "table": {
+              "name": "types",
+              "schema": "acostarep"
+            },
+            "select_permissions": [
+              {
+                "role": "gerente_area",
+                "permission": {
+                  "columns": [
+                    "is_active",
+                    "code",
+                    "combo_objeto",
+                    "name",
+                    "id"
+                  ],
+                  "filter": {}
+                },
+                "comment": ""
+              },
+              {
+                "role": "seller",
+                "permission": {
+                  "columns": [
+                    "is_active",
+                    "code",
+                    "combo_objeto",
+                    "name",
+                    "id"
+                  ],
+                  "filter": {}
+                },
+                "comment": ""
+              }
+            ]
+          }
+        ],
+        "configuration": {
+          "connection_info": {
+            "database_url": {
+              "from_env": "DB_URL_FROM_ENV"
+            },
+            "isolation_level": "read-committed",
+            "use_prepared_statements": false
+          }
+        }
+      }
+    ],
+    "backend_configs": {
+      "dataconnector": {
+        "athena": {
+          "uri": "http://localhost:8081/api/v1/athena"
+        },
+        "mariadb": {
+          "uri": "http://localhost:8081/api/v1/mariadb"
+        },
+        "mongodb": {
+          "uri": "http://localhost:8082"
+        },
+        "mysql8": {
+          "uri": "http://localhost:8081/api/v1/mysql"
+        },
+        "oracle": {
+          "uri": "http://localhost:8081/api/v1/oracle"
+        },
+        "snowflake": {
+          "uri": "http://localhost:8081/api/v1/snowflake"
+        }
+      }
+    }
+  }
+}

@@ -52,9 +52,6 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - VIRTUAL_HOST=${SUBDOMAIN_POSTGRES}
-      - LETSENCRYPT_HOST=${SUBDOMAIN_POSTGRES}
-      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL_MAIN}
     ports:
       - "5432:5432"
     volumes:
@@ -78,7 +75,7 @@ services:
       - ../../BACK_UPS:/usr/app/src/KEEP_TRACK:rw
     environment:
       - VIRTUAL_HOST=${VIRTUAL_HOST_MAIN}
-      - LETSENCRYPT_HOST=${VIRTUAL_HOST_MAIN}
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST_MAIN}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL_MAIN}
     networks:
       acosta-rep-network:
@@ -90,6 +87,31 @@ services:
       - postgres-db
     env_file:
       - ../../.env
+
+  hasura:
+    image: hasura/graphql-engine:v2.36.1
+    restart: always
+    expose:
+      - "8080"
+    environment:
+      - HASURA_GRAPHQL_DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-db:5432/postgres
+      - DB_URL_FROM_ENV=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-db:5432/postgres
+      - HASURA_GRAPHQL_ENABLE_CONSOLE="true" # Enabling Hasura Console (for development purposes)
+      - HASURA_GRAPHQL_ADMIN_SECRET=${HASURA_ADMIN_SECRET_KEY}
+      - HASURA_GRAPHQL_V1_BOOLEAN_NULL_COLLAPSE=true
+      - HASURA_GRAPHQL_CORS_DOMAIN=${HASURA_CORS_DOMAIN}
+      - HASURA_GRAPHQL_JWT_SECRET=${HASURA_JWT_SECRET}
+      - VIRTUAL_HOST=${SUBDOMAIN_HASURA}
+      - LETSENCRYPT_HOST=${SUBDOMAIN_HASURA}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL_MAIN}
+    volumes:
+      - ../hasura-metadata.json:/hasura_metadata.json
+    networks:
+      - acosta-rep-network
+    depends_on:
+      - nginx-proxy
+      - letsencrypt
+      - postgres-db
 
 volumes:
   certs:

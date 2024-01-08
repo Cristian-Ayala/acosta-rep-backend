@@ -20,3 +20,10 @@ gunzip < your_dump.sql.gz | docker exec -i your-db-container psql -U your-db-use
 scp your-user@server-ip:/docker/postgresql/backup.sql /YOUR_PATH/SET_UP
 
 cat backup.sql | docker exec -i container-name psql -U your-db-user -d postgres
+
+
+backup only the structure
+# pg_dump -U user -s database > database_structure.sql
+
+backup only data
+# pg_dump -U user -a database > database_data.sql

@@ -8,83 +8,58 @@ Nestjs project for repository [Acosta Repuestos Front-End](https://github.com/Cr
 
 # Installation
 
+1. Create and .env file and modify it with your own data. As an example there is an env.properties.
+> (You have to be on root project path)
+
+2. Read what service you are going to use and prepare what's needed.
+
+3. Run the docker-compose.yml file of your preference. Use whatever you need. Examples:
+```bash
+$ docker compose -f SET_UP/BACKEND+POSTGRESQL/docker-compose.yml --env-file ./.env up -d
+```
+
+```bash
+$ docker compose -f SET_UP/BACKEND+POSTGRESQL+NGINX/docker-compose.yml --env-file ./.env up -d
+```
+Stop and remove containers
+```bash
+$ docker compose -f SET_UP/BACKEND+POSTGRESQL+HASURA/docker-compose.yml down
+```
+
 ## RUN BACKEND ALONE
 
-You must already have postgresql and if you want nginx, to expose your the endpoints. If everything is consumed local, then you dont need to expose them.
-
-Create and .env file and modify it with your own data.
+You must already have postgresql and if you want, nginx to expose your the endpoints. If everything is consumed local, then you dont need to expose them.
 
 ```bash
 $ docker build -t acosta-rep-backend:1.0.0 -t acosta-rep-backend:latest .
-$ docker run -d -p 3000:3000 -v ./src/KEEP_TRACK:/usr/app/src/KEEP_TRACK/:rw acosta-rep-backend:1.0.0
+$ docker run -d --env-file .env -p 3000:3000 -v ./src/KEEP_TRACK:/usr/app/src/KEEP_TRACK/:rw acosta-rep-backend:1.0.0
 ```
 
-## RUN BACKEND + POSTGRESQL
+## ADD POSTGRESQL SERVICE
 
-Create an .env file and modify it with your own data.
-
-```bash
-$ docker build -t acosta-rep-backend:1.0.0 -t acosta-rep-backend:latest .
-```
-
-Create another .env file in SET_UP/BACKEND+POSTGRESQL
-
-```bash
-$ cd ./SET_UP/BACKEND+POSTGRESQL/
-$ nano .env
-```
-
-ADD variables needed (check env.properties file). It should match the values from main .env file.
-
-```bash
-$ docker compose up -d
-```
+> [!IMPORTANT]
+> Open port 5432 from your server (or port where postgres is running)
 
 If you want to reload the schema you got to delete the data volume.
 
-Warning from [postgresql docker image](https://hub.docker.com/_/postgres/): scripts in /docker-entrypoint-initdb.d are only run if you start the container with a data directory that is empty; any pre-existing database will be left untouched on container startup. One common problem is that if one of your /docker-entrypoint-initdb.d scripts fails (which will cause the entrypoint script to exit) and your orchestrator restarts the container with the already initialized data directory, it will not continue on with your scripts.
+> [!WARNING] > [Postgresql docker image](https://hub.docker.com/_/postgres/): scripts in /docker-entrypoint-initdb.d are only run if you start the container with a data directory that is empty; any pre-existing database will be left untouched on container startup. One common problem is that if one of your /docker-entrypoint-initdb.d scripts fails (which will cause the entrypoint script to exit) and your orchestrator restarts the container with the already initialized data directory, it will not continue on with your scripts.
 
 ```bash
 $ docker volume ls
 $ docker volume rm <volume_name>
 ```
 
-## RUN BACKEND + POSTGRESQL + NGINX
+## ADD NGINX SERVICE AND LETSNCRYPT
+
+> [!IMPORTANT]
+> Open ports 80 and 443 from your server
 
 You must have a domain or subdomain pointing to your server, to expose your endpoint.
 SSL certification are created with certbot, a public IP address needs to be set in your server.
 
-Remember to open the port 80 and 443.
+## ADD HASURA SERVICE
 
-Create an .env file and modify it with your own data.
-
-```bash
-$ docker build -t acosta-rep-backend:1.0.0 -t acosta-rep-backend:latest .
-```
-
-Create another .env file in SET_UP/BACKEND+POSTGRESQL+NGINX
-
-```bash
-$ cd ./SET_UP/BACKEND+POSTGRESQL+NGINX/
-$ nano .env
-```
-
-ADD variables needed (check env.properties file). It should match the values from main .env file.
-
-Modify file in ./conf/default.conf ---> server_name <YOUR_DOMAIN_OR_SUBDOMAIN>
-
-```bash
-$ docker compose up -d
-```
-
-If you want to reload the schema you got to delete the data volume.
-
-Warning from [postgresql docker image](https://hub.docker.com/_/postgres/): scripts in /docker-entrypoint-initdb.d are only run if you start the container with a data directory that is empty; any pre-existing database will be left untouched on container startup. One common problem is that if one of your /docker-entrypoint-initdb.d scripts fails (which will cause the entrypoint script to exit) and your orchestrator restarts the container with the already initialized data directory, it will not continue on with your scripts.
-
-```bash
-$ docker volume ls
-$ docker volume rm <volume_name>
-```
+Remember to set the env variables.
 
 # Useful commands
 
