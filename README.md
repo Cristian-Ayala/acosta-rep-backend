@@ -6,6 +6,44 @@
 
 Nestjs project for repository [Acosta Repuestos Front-End](https://github.com/Cristian-Ayala/acosta-repuesto-vite). It is a project to save and serve images that are uploaded in frontend project.
 
+# Requirement
+Having an Auth0 account and set up a project
+
+1. Add action flow to login:
+First action: (Check if configured)
+exports.onExecutePostLogin = async (event, api) => {
+  const allowedRoles = (event.authorization && event.authorization.roles) || [];
+  if(allowedRoles.length) return;
+  api.redirect.sendUserTo(`${event.transaction.redirect_uri}/logout`);
+};
+
+Second action: (Inject Hasura Claims)
+exports.onExecutePostLogin = async (event, api) => {
+  const allowedRoles = (event.authorization && event.authorization.roles) || [];
+  const metadata = event.user.app_metadata || {};
+
+  if (!allowedRoles.length || !event.user.email_verified)
+    api.access.deny("Email not verified");
+  api.idToken.setCustomClaim("https://hasura.io/jwt/claims", {
+    "x-hasura-default-role": allowedRoles[0],
+    "x-hasura-allowed-roles": allowedRoles,
+    "x-hasura-user-id": event.user.user_id,
+    "x-hasura-user-email": event.user.email,
+  });
+  api.idToken.setCustomClaim("metadata", metadata);
+};
+
+2. Add roles to users
+gerente_area or seller
+
+3. Add App Metadata (app_metadata), under Details tab.
+{
+  "sucursal": [
+    "Santa Ana",
+    "Metapan"
+  ]
+}
+
 # Installation
 
 1. Create and .env file and modify it with your own data. As an example there is an env.properties.
@@ -24,6 +62,14 @@ $ docker compose -f SET_UP/BACKEND+POSTGRESQL+NGINX/docker-compose.yml --env-fil
 Stop and remove containers
 ```bash
 $ docker compose -f SET_UP/BACKEND+POSTGRESQL+HASURA/docker-compose.yml down
+```
+
+(Optional)
+4. Download [Images](https://github.com/acostarep/images-backend) and paste them on BACK_UPS/uploads folder
+```bash
+$ git clone https://github.com/acostarep/images-backend
+$ mv images-backend/* /PATH/OF/THIS/PROJECT/BACK_UPS/uploads
+$ rm -rf images-backend
 ```
 
 ## RUN BACKEND ALONE
