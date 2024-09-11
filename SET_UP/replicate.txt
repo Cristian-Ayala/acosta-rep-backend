@@ -1,5 +1,12 @@
-docker exec -t postgresql-postgres-db-1 pg_dump -U your-db-user -d postgres > backup.sql
-docker cp postgresql-postgres-db-1:/backup.sql ./backups/
+timestampdata=$(date +%Y-%m-%d_%H_%M_%S) && \
+docker exec -t <CONTAINER_NAME> bash -c "pg_dump -U <USER> -a postgres > /tmp/database_data_${timestampdata}.sql" && \
+docker cp <CONTAINER_NAME>:/tmp/database_data_${timestampdata}.sql ./
+
+If you want to copy the file to a local server, you can use scp:
+scp <USER>@<IP>:<PATH_REMOTE_SERVER>/<DB_BACKUP>.sql <LOCAL_PATH>
+
+If you want to copy the file to a remote server, you can use scp:
+scp <DB_BACKUP>.sql <USER>@<IP>:<PATH_REMOTE_SERVER>
 
 /*
 https://stackoverflow.com/questions/24718706/backup-restore-a-dockerized-postgresql-database
@@ -21,6 +28,7 @@ scp your-user@server-ip:/docker/postgresql/backup.sql /YOUR_PATH/SET_UP
 
 cat backup.sql | docker exec -i container-name psql -U your-db-user -d postgres
 
+docker exec -it <DOCKER_CONTAINER>
 
 backup only the structure
 # pg_dump -U user -s database > database_structure.sql

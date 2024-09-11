@@ -37,12 +37,12 @@ class ConfigService {
       username: this.getValue("POSTGRES_USER"),
       password: this.getValue("POSTGRES_PASSWORD"),
       database: this.getValue("POSTGRES_DATABASE"),
-      entities: ["**/*.entity{.ts,.js}"],
+      entities: ["dist/**/*.entity.js"],
       migrationsTableName: "migration",
       migrations: ["src/migration/*.ts"],
       ssl: this.isProduction(),
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: !this.isProduction(),
     };
   }
 }
@@ -53,6 +53,11 @@ const configService = new ConfigService(process.env).ensureValues([
   "POSTGRES_USER",
   "POSTGRES_PASSWORD",
   "POSTGRES_DATABASE",
+  "JWT_EXPIRATION",
+  "JWT_PUBLIC_KEY_VALUE",
+  "JWT_PRIVATE_KEY_VALUE",
+  "JWT_PRIVATE_KEY_JSON",
+  "JWT_PUBLIC_KEY_JSON",
 ]);
 
 export { configService };

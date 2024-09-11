@@ -5,11 +5,13 @@ import { configService } from "./config/config.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { FileManagerModule } from "./file-manager/file-manager.module";
 import { RequestLoggerMiddleware } from "./middleware/request-logger.middleware";
+import { AuthModule } from "./auth/auth.module";
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
     FileManagerModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

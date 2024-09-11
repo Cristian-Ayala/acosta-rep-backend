@@ -49,6 +49,70 @@ COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 
 
 --
+-- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
+
+
+--
+-- Name: user_roles_enum; Type: TYPE; Schema: public; Owner: cristian
+--
+
+CREATE TYPE public.user_roles_enum AS ENUM (
+    'admin',
+    'gerente_area',
+    'seller'
+);
+
+
+ALTER TYPE public.user_roles_enum OWNER TO cristian;
+
+--
+-- Name: user_sucursal_enum; Type: TYPE; Schema: public; Owner: cristian
+--
+
+CREATE TYPE public.user_sucursal_enum AS ENUM (
+    'Santa Ana',
+    'Metapan'
+);
+
+
+ALTER TYPE public.user_sucursal_enum OWNER TO cristian;
+
+--
+-- Name: users_roles_enum; Type: TYPE; Schema: public; Owner: cristian
+--
+
+CREATE TYPE public.users_roles_enum AS ENUM (
+    'admin',
+    'gerente_area',
+    'seller'
+);
+
+
+ALTER TYPE public.users_roles_enum OWNER TO cristian;
+
+--
+-- Name: users_sucursal_enum; Type: TYPE; Schema: public; Owner: cristian
+--
+
+CREATE TYPE public.users_sucursal_enum AS ENUM (
+    'Santa Ana',
+    'Metapan'
+);
+
+
+ALTER TYPE public.users_sucursal_enum OWNER TO cristian;
+
+--
 -- Name: set_current_timestamp_updated_at(); Type: FUNCTION; Schema: acostarep; Owner: cristian
 --
 
@@ -529,6 +593,24 @@ CREATE TABLE hdb_catalog.hdb_version (
 ALTER TABLE hdb_catalog.hdb_version OWNER TO cristian;
 
 --
+-- Name: users; Type: TABLE; Schema: public; Owner: cristian
+--
+
+CREATE TABLE public.users (
+    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,
+    name character varying(20) NOT NULL,
+    email character varying(100) NOT NULL,
+    password character varying(100) NOT NULL,
+    active boolean DEFAULT true NOT NULL,
+    created_on timestamp without time zone DEFAULT now() NOT NULL,
+    sucursal public.users_sucursal_enum[] NOT NULL,
+    roles public.users_roles_enum[] NOT NULL
+);
+
+
+ALTER TABLE public.users OWNER TO cristian;
+
+--
 -- Name: cliente id; Type: DEFAULT; Schema: acostarep; Owner: cristian
 --
 
@@ -691,6 +773,22 @@ ALTER TABLE ONLY hdb_catalog.hdb_schema_notifications
 
 ALTER TABLE ONLY hdb_catalog.hdb_version
     ADD CONSTRAINT hdb_version_pkey PRIMARY KEY (hasura_uuid);
+
+
+--
+-- Name: users PK_a3ffb1c0c8416b9fc6f907b7433; Type: CONSTRAINT; Schema: public; Owner: cristian
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY (id);
+
+
+--
+-- Name: users UQ_97672ac88f789774dd47f7c8be3; Type: CONSTRAINT; Schema: public; Owner: cristian
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT "UQ_97672ac88f789774dd47f7c8be3" UNIQUE (email);
 
 
 --

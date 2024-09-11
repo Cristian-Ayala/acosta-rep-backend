@@ -1,7 +1,6 @@
 import { LoggerService as LS } from "@nestjs/common";
 import * as winston from "winston";
-import * as winstonDailyRotateFile from "winston-daily-rotate-file";
-
+import winstonDailyRotateFile from "winston-daily-rotate-file";
 class LoggerService implements LS {
   private logger: winston.Logger;
 

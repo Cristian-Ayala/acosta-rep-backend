@@ -7,42 +7,21 @@
 Nestjs project for repository [Acosta Repuestos Front-End](https://github.com/Cristian-Ayala/acosta-repuesto-vite). It is a project to save and serve images that are uploaded in frontend project.
 
 # Requirement
-Having an Auth0 account and set up a project
+Generate public and private keys for JWT
+```bash
+$ openssl genpkey -algorithm RSA -out private.key -pkeyopt rsa_keygen_bits:2048
+$ openssl rsa -pubout -in private.key -out public.key
+$ awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' private.key # copy this output to .env file as <JWT_PRIVATE_KEY_VALUE>
+$ awk 'NF {sub(/\r/, ""); printf "%s\\n",$0;}' public.key # copy this output to .env file as <JWT_PUBLIC_KEY_VALUE>
+```
 
-1. Add action flow to login:
-First action: (Check if configured)
-exports.onExecutePostLogin = async (event, api) => {
-  const allowedRoles = (event.authorization && event.authorization.roles) || [];
-  if(allowedRoles.length) return;
-  api.redirect.sendUserTo(`${event.transaction.redirect_uri}/logout`);
-};
+By default the admin user is:
+```bash
+$ email: admin@admin.com
+$ password: abc123
+```
 
-Second action: (Inject Hasura Claims)
-exports.onExecutePostLogin = async (event, api) => {
-  const allowedRoles = (event.authorization && event.authorization.roles) || [];
-  const metadata = event.user.app_metadata || {};
-
-  if (!allowedRoles.length || !event.user.email_verified)
-    api.access.deny("Email not verified");
-  api.idToken.setCustomClaim("https://hasura.io/jwt/claims", {
-    "x-hasura-default-role": allowedRoles[0],
-    "x-hasura-allowed-roles": allowedRoles,
-    "x-hasura-user-id": event.user.user_id,
-    "x-hasura-user-email": event.user.email,
-  });
-  api.idToken.setCustomClaim("metadata", metadata);
-};
-
-2. Add roles to users
-gerente_area or seller
-
-3. Add App Metadata (app_metadata), under Details tab.
-{
-  "sucursal": [
-    "Santa Ana",
-    "Metapan"
-  ]
-}
+Change password once logged in.
 
 # Installation
 
