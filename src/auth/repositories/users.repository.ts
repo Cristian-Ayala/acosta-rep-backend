@@ -26,7 +26,9 @@ export class UsersRepository extends Repository<User> {
       .map((sucursal) => Sucursal[sucursal])
       .filter((sucursal) => sucursal != null);
 
-    return validSucursales.length > 0 ? validSucursales : [Sucursal.SANTA_ANA];
+    return validSucursales.length > 0
+      ? validSucursales
+      : [Sucursal["Santa Ana"]];
   }
 
   // Helper method to validate and map role values
@@ -35,10 +37,15 @@ export class UsersRepository extends Repository<User> {
       .map((role) => Role[role])
       .filter((role) => role != null);
 
-    return validRoles.length > 0 ? validRoles : [Role.SELLER];
+    return validRoles.length > 0 ? validRoles : [Role.seller];
   }
 
-  async createUser(registerUserDto: RegisterUserDto): Promise<void> {
+  public validateAdminRole(user: User): boolean {
+    return (
+      user.roles.includes(Role.admin) || user.roles.includes(Role.gerente_area)
+    );
+  }
+  async createUser(registerUserDto: RegisterUserDto): Promise<User> {
     const { name, email, password, sucursal, roles } = registerUserDto;
 
     // Use helper methods to validate and map enums
@@ -54,7 +61,8 @@ export class UsersRepository extends Repository<User> {
     });
 
     try {
-      await this.save(user);
+      const savedUser = await this.save(user);
+      return savedUser;
     } catch (e) {
       if (e.message.includes("duplicate key value"))
         // Postgres error message

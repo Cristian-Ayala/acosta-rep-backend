@@ -7,14 +7,19 @@ import { GetUser } from "../decorators/get-user.decorator";
 import { User } from "../interfaces/user.entity";
 import { ChangePasswordDto } from "../dto/change-password.dto";
 import { Response } from "express";
+import { ChangePasswordAdminDto } from "../dto/change-password-admin.dto";
 
 @Controller("auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post("/register")
-  register(@Body() registerUserDto: RegisterUserDto): Promise<void> {
-    return this.authService.registerUser(registerUserDto);
+  @UseGuards(AuthGuard())
+  register(
+    @Body() registerUserDto: RegisterUserDto,
+    @Res() res: Response,
+  ): Promise<Response> {
+    return this.authService.registerUser(registerUserDto, res);
   }
 
   @Post("/login")
@@ -27,7 +32,18 @@ export class AuthController {
   changePassword(
     @Body() changePasswordDto: ChangePasswordDto,
     @GetUser() user: User,
-  ): Promise<void> {
-    return this.authService.changePassword(changePasswordDto, user);
+    @Res() res: Response,
+  ): Promise<Response> {
+    return this.authService.changePassword(changePasswordDto, user, res);
+  }
+
+  @Patch("/change-password-admin")
+  @UseGuards(AuthGuard())
+  changePasswordAdmin(
+    @Body() changePasswordAdminDto: ChangePasswordAdminDto,
+    @GetUser() user: User,
+    @Res() res: Response,
+  ): Promise<Response> {
+    return this.authService.changePasswordAdmin(changePasswordAdminDto, user, res);
   }
 }

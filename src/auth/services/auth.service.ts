@@ -4,17 +4,18 @@ import {
   Res,
   UnauthorizedException,
 } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Response } from "express";
+import { ChangePasswordAdminDto } from "../dto/change-password-admin.dto";
+import { ChangePasswordDto } from "../dto/change-password.dto";
+import { LoginDto } from "../dto/login.dto";
 import { RegisterUserDto } from "../dto/register-user.dto";
+import { JwtPayload } from "../interfaces/jwt.payload";
+import { User } from "../interfaces/user.entity";
 import { UsersRepository } from "../repositories/users.repository";
 import { EncoderService } from "../services/encoder.service";
-import { LoginDto } from "../dto/login.dto";
-import { JwtService } from "@nestjs/jwt";
-import { JwtPayload } from "../interfaces/jwt.payload";
-import { ChangePasswordDto } from "../dto/change-password.dto";
-import { User } from "../interfaces/user.entity";
-import { ConfigService } from "@nestjs/config";
-import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -26,11 +27,15 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async registerUser(registerUserDto: RegisterUserDto): Promise<void> {
+  async registerUser(
+    registerUserDto: RegisterUserDto,
+    @Res() res: Response,
+  ): Promise<Response> {
     registerUserDto.password = await this.enconderService.encodePassword(
       registerUserDto.password,
     );
-    return this.usersRepository.createUser(registerUserDto);
+    const usr = await this.usersRepository.createUser(registerUserDto);
+    return res.status(201).json({ message: "Usuario creado correctamente" });
   }
 
   async login(loginDto: LoginDto, @Res() res: Response): Promise<Response> {
@@ -65,13 +70,43 @@ export class AuthService {
   async changePassword(
     changePasswordDto: ChangePasswordDto,
     user: User,
-  ): Promise<void> {
+    @Res() res: Response,
+  ): Promise<Response> {
     const { oldPassword, newPassword } = changePasswordDto;
     if (await this.enconderService.checkPassword(oldPassword, user.password)) {
       user.password = await this.enconderService.encodePassword(newPassword);
       this.usersRepository.save(user);
+      return res
+        .status(200)
+        .json({ message: "Contraseña cambiada correctamente" });
     } else {
-      throw new BadRequestException("Old password does not match");
+      throw new BadRequestException("La contraseña actual no es correcta");
     }
+  }
+
+  async changePasswordAdmin(
+    changePasswordDto: ChangePasswordAdminDto,
+    user: User,
+    @Res() res: Response,
+  ): Promise<Response> {
+    const { newPassword, idUser } = changePasswordDto;
+
+    if (!this.usersRepository.validateAdminRole(user))
+      throw new UnauthorizedException(
+        "No tienes permisos para realizar esta acción",
+      );
+
+    const userModify = await this.usersRepository.findOneBy({ id: idUser });
+
+    if (!userModify)
+      throw new BadRequestException("El usuario no existe en la base de datos");
+
+    userModify.password =
+      await this.enconderService.encodePassword(newPassword);
+    this.usersRepository.save(userModify);
+
+    return res
+      .status(200)
+      .json({ message: "Contraseña cambiada correctamente" });
   }
 }

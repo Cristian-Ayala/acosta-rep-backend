@@ -1,10 +1,10 @@
 export enum Sucursal {
-  SANTA_ANA = "Santa Ana",
-  METAPAN = "Metapan",
+  "Santa Ana" = "Santa Ana",
+  "Metapan" = "Metapan",
 }
 
 export enum Role {
-  ADMIN = "admin",
-  MANAGER = "gerente_area",
-  SELLER = "seller",
+  "admin" = "admin",
+  "gerente_area" = "gerente_area",
+  "seller" = "seller",
 }
