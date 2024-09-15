@@ -32,11 +32,7 @@ class ConfigService {
   public getTypeOrmConfig(): TypeOrmModuleOptions {
     return {
       type: "postgres",
-      host: this.getValue("POSTGRES_HOST"),
-      port: parseInt(this.getValue("POSTGRES_PORT")),
-      username: this.getValue("POSTGRES_USER"),
-      password: this.getValue("POSTGRES_PASSWORD"),
-      database: this.getValue("POSTGRES_DATABASE"),
+      url: this.getValue("DATABASE_URL"),
       entities: ["dist/**/*.entity.js"],
       migrationsTableName: "migration",
       migrations: ["src/migration/*.ts"],
@@ -48,11 +44,7 @@ class ConfigService {
 }
 
 const configService = new ConfigService(process.env).ensureValues([
-  "POSTGRES_HOST",
-  "POSTGRES_PORT",
-  "POSTGRES_USER",
-  "POSTGRES_PASSWORD",
-  "POSTGRES_DATABASE",
+  "DATABASE_URL",
   "JWT_EXPIRATION",
   "JWT_PUBLIC_KEY_VALUE",
   "JWT_PRIVATE_KEY_VALUE",
