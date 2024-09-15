@@ -37,6 +37,11 @@ class ConfigService {
       migrationsTableName: "migration",
       migrations: ["src/migration/*.ts"],
       ssl: this.isProduction(),
+      extra: {
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      },
       autoLoadEntities: true,
       synchronize: !this.isProduction(),
     };
