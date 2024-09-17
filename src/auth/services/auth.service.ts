@@ -42,7 +42,7 @@ export class AuthService {
     const { email, password } = loginDto;
     const user = await this.usersRepository.findOneByEmail(email);
 
-    if (!(await this.enconderService.checkPassword(password, user.password)))
+    if (!user.active || !(await this.enconderService.checkPassword(password, user.password)))
       throw new UnauthorizedException("Por favor, verifica tus credenciales");
 
     const payload: JwtPayload = {

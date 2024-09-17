@@ -1,43 +1,100 @@
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { v4 as uuidv4 } from "uuid";
 import { Response } from "express";
+import { Readable } from "stream";
 import loggerService from "../../logger.service";
+import { Upload } from "@aws-sdk/lib-storage";
 
 @Injectable()
 export class FileManagerService {
-  constructor() {}
+  private readonly s3Client = new S3Client({
+    region: this.configService.getOrThrow("AWS_S3_REGION"),
+  });
 
-  processUploadedFiles(
+  constructor(private readonly configService: ConfigService) {}
+
+  async processUploadedFiles(
     files: Express.Multer.File[],
-    userEmail: string,
-  ): ProcessedFilesResult {
-    if (!files)
+    userId: string,
+  ): Promise<ProcessedFilesResult> {
+    if (!files || files.length === 0)
       return {
         errors: ["No files found"],
         savedFileNames: null,
         savedFilesOriginalNames: null,
       };
-    files.forEach((file) => {
-      const tmpFile = { ...file, userEmail };
-      loggerService.log(`uploaded File: ${JSON.stringify(tmpFile)}`);
+
+    // Store filenames used for S3 uploads and track successful uploads
+    const successfulUploads: { originalName: string; uniqueName: string }[] =
+      [];
+    const errors: string[] = [];
+
+    const uploadPromises = files.map(async (file) => {
+      const uniqueFilename = `${uuidv4()}_${file.originalname}`;
+      const tmpFile = { name: uniqueFilename, userId };
+      loggerService.log(`Uploading File: ${JSON.stringify(tmpFile)}`);
+
+      const fileStream = Readable.from(file.buffer);
+
+      try {
+        await new Upload({
+          client: this.s3Client,
+          params: {
+            Bucket: this.configService.getOrThrow("AWS_S3_BUCKET_NAME"),
+            Key: uniqueFilename,
+            Body: fileStream,
+            ContentType: file.mimetype,
+          },
+        }).done();
+
+        // Track successful uploads
+        successfulUploads.push({
+          originalName: file.originalname,
+          uniqueName: uniqueFilename,
+        });
+      } catch (error) {
+        loggerService.error("Error uploading file to S3:", error);
+        errors.push(`Failed to upload ${file.originalname}`);
+      }
     });
+
+    await Promise.all(uploadPromises);
+
     return {
-      errors: null,
-      savedFileNames: files.map((file) => file.filename),
-      savedFilesOriginalNames: files.map((file) => file.originalname),
+      errors: errors.length > 0 ? errors : null,
+      savedFileNames: successfulUploads.map((file) => file.uniqueName),
+      savedFilesOriginalNames: successfulUploads.map(
+        (file) => file.originalName,
+      ),
     };
   }
 
-  serveDefaultPhoto(res: Response): void {
-    res.sendFile("default.jpg", { root: "src/KEEP_TRACK/uploads" });
+  async serveDefaultPhoto(res: Response): Promise<void> {
+    await this.servePhoto("default.jpg", res);
   }
 
-  servePhoto(filename: string, res: Response): void {
-    res.sendFile(filename, { root: "src/KEEP_TRACK/uploads" });
+  async servePhoto(filename: string, res: Response): Promise<void> {
+    try {
+      const command = new GetObjectCommand({
+        Bucket: this.configService.getOrThrow("AWS_S3_BUCKET_NAME"),
+        Key: filename,
+      });
+
+      const s3Response = await this.s3Client.send(command);
+      const s3Stream = s3Response.Body as Readable;
+
+      s3Stream.pipe(res);
+    } catch (error) {
+      loggerService.error("Error retrieving photo from S3:", error);
+      res.status(500).send("Error retrieving photo");
+    }
   }
 }
 
 export interface ProcessedFilesResult {
-  errors: string[];
-  savedFileNames: string[];
-  savedFilesOriginalNames: string[];
+  errors: string[] | null;
+  savedFileNames: string[] | null;
+  savedFilesOriginalNames: string[] | null;
 }

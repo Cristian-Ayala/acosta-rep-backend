@@ -1,24 +1,24 @@
 import {
-  BadRequestException,
-  Controller,
-  Post,
-  Get,
-  UploadedFiles,
-  UseInterceptors,
-  Param,
-  Res,
   Body,
+  Controller,
+  FileTypeValidator,
+  Get,
+  MaxFileSizeValidator,
+  Param,
+  ParseFilePipe,
+  Post,
+  Res,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
-import loggerService from "../../logger.service";
+import { AuthGuard } from "@nestjs/passport";
 import { FilesInterceptor } from "@nestjs/platform-express";
-import { diskStorage } from "multer";
 import { Response } from "express";
 import {
   FileManagerService,
   ProcessedFilesResult,
 } from "../services/file-manager.service";
-import { AuthGuard } from "@nestjs/passport";
 
 function replaceDotsWithUnderscores(inputString: string): [string, string] {
   const parts = inputString.split(".");
@@ -32,45 +32,22 @@ export class FileManagerController {
 
   @UseGuards(AuthGuard())
   @Post("upload-photo")
-  @UseInterceptors(
-  FilesInterceptor("file", 10, {
-      storage: diskStorage({
-        destination: "src/KEEP_TRACK/uploads",
-        filename: (req, file, cb) => {
-          loggerService.log(`filename file ${JSON.stringify(file, null, 2)}`);
-          loggerService.log(`filename file type: ${typeof file}`);
-          loggerService.log(`filename file originalname: ${file.originalname}`);
-          const [name, fileExtName] = replaceDotsWithUnderscores(
-            file.originalname,
-          );
-          const newFileName = `${name}-${Date.now()}.${fileExtName}`;
-          cb(null, newFileName);
-        },
-      }),
-      fileFilter: (req, file, cb) => {
-        loggerService.log(`fileFilter file ${JSON.stringify(file, null, 2)}`);
-        loggerService.log(`fileFilter file type: ${typeof file}`);
-        loggerService.log(`fileFilter file originalname: ${file.originalname}`);
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
-          return cb(
-            new BadRequestException("Only image files are allowed!"),
-            false,
-          );
-        }
-        cb(null, true);
-      },
-    }),
-  )
+  @UseInterceptors(FilesInterceptor("file"))
   async uploadPhoto(
-    @UploadedFiles() files: Express.Multer.File[],
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1 * 1024 * 1024 }), // 1MB
+          new FileTypeValidator({ fileType: /^image\/(jpeg|png|webp|gif)$/ }),
+        ],
+      }),
+    )
+    files: Express.Multer.File[],
     @Body() body: any,
   ): Promise<ProcessedFilesResult> {
     // Make sure the necessary properties are defined before accessing them
-    const userEmail = body.userEmail || null;
-    loggerService.log(`userEmail ${userEmail}`);
-    loggerService.log(`files ${files}`);
-    loggerService.log(`files ${JSON.stringify(files, null, 2)}`);
-    return this.fileManagerService.processUploadedFiles(files, userEmail);
+    const userId = body.userId || null;
+    return this.fileManagerService.processUploadedFiles(files, userId);
   }
 
   @UseGuards(AuthGuard())
