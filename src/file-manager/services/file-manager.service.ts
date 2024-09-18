@@ -81,7 +81,7 @@ export class FileManagerService {
     return getSignedUrl({
       url: `https://${this.cloudFrontDomain}/${filename}`,
       keyPairId: this.configService.getOrThrow("AWS_CLOUDFRONT_KEY_PAIR_ID"),
-      privateKey: this.configService.getOrThrow("JWT_PRIVATE_KEY_VALUE"), // AWS_CLOUDFRONT_PRIVATE_KEY
+      privateKey: this.configService.getOrThrow("AWS_CLOUDFRONT_PRIVATE_KEY"),
       dateLessThan: new Date(Date.now() + 1000 * 60 * 60 * 24).toString(), // 24 hours
     });
   }
