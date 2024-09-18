@@ -1,4 +1,5 @@
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/cloudfront-signer";
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { v4 as uuidv4 } from "uuid";
@@ -12,6 +13,10 @@ export class FileManagerService {
   private readonly s3Client = new S3Client({
     region: this.configService.getOrThrow("AWS_S3_REGION"),
   });
+
+  private readonly cloudFrontDomain = this.configService.getOrThrow(
+    "AWS_CLOUDFRONT_DOMAIN",
+  ); // Add CloudFront domain
 
   constructor(private readonly configService: ConfigService) {}
 
@@ -71,23 +76,26 @@ export class FileManagerService {
     };
   }
 
+  // Generate CloudFront URL for a given file
+  async getCloudFrontUrl(filename: string): Promise<string> {
+    return getSignedUrl({
+      url: `https://${this.cloudFrontDomain}/${filename}`,
+      keyPairId: this.configService.getOrThrow("AWS_CLOUDFRONT_KEY_PAIR_ID"),
+      privateKey: this.configService.getOrThrow("JWT_PRIVATE_KEY_VALUE"), // AWS_CLOUDFRONT_PRIVATE_KEY
+      dateLessThan: new Date(Date.now() + 1000 * 60 * 60 * 24).toString(), // 24 hours
+    });
+  }
+
   async serveDefaultPhoto(res: Response): Promise<void> {
     await this.servePhoto("default.jpg", res);
   }
 
   async servePhoto(filename: string, res: Response): Promise<void> {
     try {
-      const command = new GetObjectCommand({
-        Bucket: this.configService.getOrThrow("AWS_S3_BUCKET_NAME"),
-        Key: filename,
-      });
-
-      const s3Response = await this.s3Client.send(command);
-      const s3Stream = s3Response.Body as Readable;
-
-      s3Stream.pipe(res);
+      const cloudFrontUrl = await this.getCloudFrontUrl(filename);
+      res.redirect(cloudFrontUrl);
     } catch (error) {
-      loggerService.error("Error retrieving photo from S3:", error);
+      loggerService.error("Error generating CloudFront URL:", error);
       res.status(500).send("Error retrieving photo");
     }
   }
