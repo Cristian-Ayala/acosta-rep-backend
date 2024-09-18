@@ -93,7 +93,7 @@ export class FileManagerService {
   async servePhoto(filename: string, res: Response): Promise<void> {
     try {
       const cloudFrontUrl = await this.getCloudFrontUrl(filename);
-      res.redirect(cloudFrontUrl);
+      res.status(200).send(cloudFrontUrl);
     } catch (error) {
       loggerService.error("Error generating CloudFront URL:", error);
       res.status(500).send("Error retrieving photo");
